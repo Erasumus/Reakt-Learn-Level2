@@ -115,6 +115,136 @@ window.addEventListener("DOMContentLoaded", () => {
 
     setClock(endtime, '.timer');
 
+
+    //Modal
+    let paddingoffset = window.innerWidth - document.body.offsetWidth + "px"; //Величина скроллбара
+    let modalopen = false; // было ли открыто модальное окно
+    const openModal = document.querySelectorAll('[data-modal]'),
+          modal = document.querySelector('.modal'),
+          closeModal = document.querySelectorAll('[data-close]');
+
+    function Modal(){
+        modal.classList.toggle("show");
+        if(document.body.style.overflow == "" && modal.classList.contains("show")){
+            modalopen = true; // модальное окно было открыто
+            document.body.style.overflow = "hidden";
+            document.body.style.paddingRight = `${paddingoffset}`;
+        } else {
+            document.body.style.overflow = "";
+            document.body.style.paddingRight = "";
+        }
+    }
+
+    function ShowModalByScroll(){
+        if(!modalopen){
+            setTimeout(()=>{
+                if(window.pageYOffset + document.documentElement.clientHeight >= 3715 &&
+                    window.pageYOffset + document.documentElement.clientHeight <= 4500) { // Появл. когда скролл у калькулятора
+                        Modal();
+                    }
+            }, 5000);
+            window.removeEventListener('scroll', ShowModalByScroll);
+        }
+    }
+
+    openModal.forEach(element => {
+        element.addEventListener('click', ()=>{
+            Modal();
+        });
+    });
+
+    closeModal.forEach(element => {
+        element.addEventListener('click', ()=>{
+            Modal();
+        });
+    });
+
+    modal.addEventListener('click', (element)=>{
+        if(element.target == modal){
+            Modal();
+        }
+    });
+
+    document.addEventListener('keydown', (element)=>{
+        if(element.code === "Escape" && modal.classList.contains('show')){
+            Modal();
+        }
+    });
+ 
+    window.addEventListener('scroll', ShowModalByScroll);
+
+    // Используем классы для карточек
+    class MenuCard {
+        constructor(src, alt, title, description, price, parentSelector, ...classes) {
+            this.src = src;
+            this.alt = alt;
+            this.title = title;
+            this.description = description;
+            this.price = price;
+            this.classes = classes;
+            this.parent = document.querySelector(parentSelector);
+            this.transfer = 27;
+            this.changeToUAH();
+      }
+
+        changeToUAH() {
+            this.price = this.price * this.transfer;
+      }
+
+        render() {
+            const element = document.createElement("div");
+            
+            if(this.classes.length === 0){
+                this.element = 'menu__item';
+                element.classList.add(this.element);
+            } 
+            else{
+                this.classes.forEach(className => element.classList.add(className));
+            }
+
+            element.innerHTML = `
+                    <img src=${this.src} alt=${this.alt}>
+                    <h3 class="menu__item-subtitle">${this.title}</h3>
+                    <div class="menu__item-descr">${this.description}</div>
+                    <div class="menu__item-divider"></div>
+                    <div class="menu__item-price">
+                        <div class="menu__item-cost">Цена:</div>
+                        <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+                    </div>
+            `;
+            this.parent.append(element);
+        }
+    }
+
+    new MenuCard(
+        "img/tabs/vegy.jpg",
+        "vegy",
+        'Меню "Фитнес"',
+        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+        9,
+        '.menu .container',
+        'menu__item'
+    ).render();
+
+    new MenuCard(
+        "img/tabs/elite.jpg",
+        "elite",
+        'Меню “Премиум”',
+        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+        9,
+        '.menu .container',
+        'menu__item'
+    ).render();
+
+    new MenuCard(
+        "img/tabs/post.jpg",
+        "post",
+        '"Меню "Постное"',
+        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+        9,
+        '.menu .container',
+        'menu__item'
+    ).render();
 });
 
 
